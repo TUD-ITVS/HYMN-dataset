@@ -31,7 +31,7 @@ class Dataset:
 
     def __init__(
         self,
-        folder: Union[str, Path] = "data",
+        folder: Union[str, Path] = "data/processed/",
         systems: list[str] = ["wifi", "gnss", "ble", "uwb", "nr5g"],
         backend: str = "parquet",
         use_tqdm: bool = False,
@@ -149,11 +149,117 @@ class Dataset:
             yield self[i]
 
 
+def example_calculate_wifi_ranging_error(measurement: Dict[str, Any]):
+    """
+    Exemplary function to illustrate the usage of the Dataset iterator. Calculates the WiFi ranging error based on
+    the provided measurement and reference position data.
+
+    This function processes a WiFi measurement dictionary containing information about anchor IDs, ranges, and
+    timestamps. It calculates the error between the measured distances and the true distances obtained from
+    predefined reference points and anchor coordinates. The result is a DataFrame containing the measured range,
+    true range, and their error for each anchor ID.
+
+    Args:
+        measurement (Dict[str, Any]): A dictionary containing WiFi measurement data. Must include:
+            - "wifi": A pandas DataFrame or Series with WiFi data for anchor IDs and ranges.
+            - "point_id": A unique identifier for a reference point.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the following columns:
+            - "ts": Timestamp of the measurement.
+            - "point_id": The reference point identifier.
+            - "anchor_id": The identifier of the WiFi anchor.
+            - "measured_range": The measured distance to the anchor.
+            - "true_range": The true distance to the anchor from the reference point.
+            - "error": The difference between measured and true distances.
+    """
+
+    wifi_obj = measurement.get("wifi")
+    point_id = measurement.get("point_id")
+
+    if wifi_obj is None or point_id is None:
+        raise ValueError("Measurement must contain 'wifi' and 'point_id'")
+
+    # Normalize to DataFrame
+    if isinstance(wifi_obj, pd.Series):
+        wifi_df = wifi_obj.to_frame().T
+    elif isinstance(wifi_obj, pd.DataFrame):
+        wifi_df = wifi_obj
+    else:
+        raise NotImplementedError(f"Unsupported wifi object type: {type(wifi_obj)}")
+
+    base = Path(__file__).resolve().parents[1]
+    ref_anchor_path = base / "data" / "reference" / "pickle" / "anchor_coordinates.pkl"
+    ref_point_path = base / "data" / "reference" / "pickle" / "point_coordinates.pkl"
+
+    anchors = pd.read_pickle(ref_anchor_path)
+    points = pd.read_pickle(ref_point_path)
+
+    # --- Reference position of the WiFi device for this point_id
+    p = points.loc[points["point_id"].astype(str) == str(point_id)]
+    if p.empty:
+        raise ValueError(f"No point found for point_id '{point_id}'")
+
+    # Point reference for WiFi
+    x_col, y_col, z_col = "X_LOCAL_WIFI", "Y_LOCAL_WIFI", "Z_LOCAL_WIFI"
+
+    p0 = p.iloc[0]
+    ref = pd.to_numeric(pd.Series([p0.get(x_col), p0.get(y_col), p0.get(z_col)]), errors="coerce").to_numpy(dtype=float)
+    if pd.isna(ref).any():
+        raise ValueError(f"Missing reference position for point_id '{point_id}'")
+
+    # --- Anchor positions (WiFi)
+    if "point_id" not in anchors.columns:
+        raise KeyError(f"anchor_coordinates is missing required column 'point_id'")
+
+    wifi_anchors = anchors[anchors["point_id"].astype(str).str.upper().str.startswith("WIFI_")].copy()
+    anchor_pos = {
+        str(r["point_id"]): pd.to_numeric(pd.Series([r["X_LOCAL"], r["Y_LOCAL"], r["Z_LOCAL"]]), errors="coerce").to_numpy(dtype=float)
+        for _, r in wifi_anchors.iterrows()
+    }
+
+    rows: list[dict[str, Any]] = []
+
+    # Each wifi row has `anchor_ids` and `ranges` lists
+    for _, wrow in wifi_df.iterrows():
+        anchor_ids = wrow.get("anchor_ids")
+        ranges = wrow.get("ranges")
+
+        if not isinstance(anchor_ids, list) or not isinstance(ranges, list):
+            continue
+
+        ts = wrow.get("ts", measurement.get("ts"))
+
+        for aid, meas_r in zip(anchor_ids, ranges):
+            axyz = anchor_pos.get(aid)
+            if axyz is None or (isinstance(meas_r, float) and pd.isna(meas_r)):
+                continue
+
+            true_r = float(((axyz - ref) ** 2).sum() ** 0.5)
+            meas_r_f = float(meas_r)
+            rows.append(
+                {
+                    "ts": ts,
+                    "point_id": point_id,
+                    "anchor_id": aid,
+                    "measured_range": meas_r_f,
+                    "true_range": true_r,
+                    "error": abs(meas_r_f - true_r),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 if __name__ == "__main__":
-    ds = Dataset(folder="data", systems=["wifi", "gnss", "ble", "uwb", "nr5g"], backend="parquet", use_tqdm=True)
+    ds = Dataset(folder="data/processed/", systems=["wifi", "gnss", "ble", "uwb", "nr5g"], backend="parquet", use_tqdm=True)
     print(f"Dataset length: {len(ds)}")
 
     for i, item in enumerate(ds):
-        print(f"Item {i}: {item}")
+        if item["wifi"] is not None:
+            epoch_statistics = example_calculate_wifi_ranging_error(item)
+            print("Epoch WiFi Ranging Error for epoch {i}:".format(i=i))
+            print(epoch_statistics)
+            print(" \nRanging error statistics:") 
+            print(epoch_statistics["error"].describe())
         if i >= 10:
             break

@@ -1,0 +1,11 @@
+[project]
+name = "HYMN-examples"
+version = "1.0.0"
+description = "Example code for using the HYMN library"
+readme = "README.md"
+requires-python = ">=3.10, <=3.12"
+dependencies = [
+  "pandas>=2.0.0",
+  "pyarrow~=22.0.0",
+  "gnss-lib-py>=0.1.0",
+]
