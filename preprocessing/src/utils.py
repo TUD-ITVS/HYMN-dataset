@@ -87,8 +87,7 @@ def add_point_ground_truth(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = get_pointid_from_timestamp(df)
     df = get_ground_truth(df)
-    df.rename(columns={"mess_id": "point_id"}, inplace=True)
-    df = rename_points(df)
+    #df = rename_points(df)
     return df
 
 def get_ground_truth(df: pd.DataFrame) -> pd.DataFrame:
@@ -102,8 +101,8 @@ def get_ground_truth(df: pd.DataFrame) -> pd.DataFrame:
         the ground truth dataset.
     :rtype: pd.DataFrame
     """
-    ground_truth = pd.read_pickle("preprocessing/reference/ground_truth.pkl")
-    df = df.merge(ground_truth, on="mess_id", how="outer")
+    ground_truth = pd.read_pickle("data/reference/pickle/point_coordinates.pkl")
+    df = df.merge(ground_truth, on="point_id", how="outer")
     df.sort_values(by="ts", inplace=True)
     return df
 
@@ -117,25 +116,24 @@ def get_pointid_from_timestamp(df: pd.DataFrame) -> pd.DataFrame:
     :param df: A pandas DataFrame containing a column "ts" with timestamps in
         milliseconds.
     :type df: pd.DataFrame
-    :return: A pandas DataFrame updated with columns "mess_id" for the measurement ID. Original rows outside any
+    :return: A pandas DataFrame updated with columns "point" for the measurement ID. Original rows outside any
         defined time window are removed.
     :rtype: pd.DataFrame
     """
-    measurement_time = pd.read_pickle("preprocessing/reference/time_reference.pkl")
+    measurement_time = pd.read_pickle("data/reference/pickle/time_reference.pkl")
     df["local_time"] = pd.to_datetime(df["ts"].astype(float), unit="ms") + pd.Timedelta(hours=2)
     for idx, row in measurement_time.iterrows():
         # Determine which rows fall into the current time window
-        in_window = (df["local_time"] >= row["startTime"]) & (
-                df["local_time"] <= row["endTime"]
+        in_window = (df["local_time"] >= row["start_time_local"]) & (
+                df["local_time"] <= row["end_time_local"]
         )
-        df.loc[in_window, "mess_id"] = row["mess_id"]
+        df.loc[in_window, "point_id"] = row["point"]
 
     df.drop(columns=["local_time"], inplace=True)
-    df.dropna(subset=["mess_id"], inplace=True)
-
+    df.dropna(subset=["point_id"], inplace=True)
     return df
 
 def save_df(df: pd.DataFrame, system_str: str) -> None:
-    df.to_csv(f"data/csv/{system_str}.csv", index=False, encoding="utf-8")
-    df.to_pickle(f"data/pickle/{system_str}.pkl")
-    df.to_parquet(f"data/parquet/{system_str}.parquet")
+    df.to_csv(f"data/processed/csv/{system_str}.csv", index=False, encoding="utf-8")
+    df.to_pickle(f"data/processed/pickle/{system_str}.pkl")
+    df.to_parquet(f"data/processed/parquet/{system_str}.parquet")

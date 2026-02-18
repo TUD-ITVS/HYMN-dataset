@@ -14,17 +14,13 @@ preprocessing_script_paths = {
 }
 
 preprocessed_data_paths = {
-    'wifi': 'data/pickle/wifi.pkl',
-    'ble': 'data/pickle/ble.pkl',
-    'uwb': 'data/pickle/uwb.pkl',
-    'gnss': 'data/pickle/gnss.pkl',
-    'nr5g': 'data/pickle/nr5g.pkl'
+    'wifi': 'data/processed/pickle/wifi.pkl',
+    'ble': 'data/processed/pickle/ble.pkl',
+    'uwb': 'data/processed/pickle/uwb.pkl',
+    'gnss': 'data/processed/pickle/gnss.pkl',
+    'nr5g': 'data/processed/pickle/nr5g.pkl'
 }
 
-def create_folder_structure() -> None:
-    os.makedirs('data/pickle/', exist_ok=True)
-    os.makedirs('data/csv/', exist_ok=True)
-    os.makedirs('data/parquet/', exist_ok=True)
 
 def run_script(script_path: str) -> tuple[str, str, str]:
     python_path = sys.executable  # Get current Python interpreter path
@@ -43,7 +39,6 @@ def run_preprocessing_scripts(scripts: list[str]) -> None:
     :type scripts: list[str]
     :return: None
     """
-    create_folder_structure()
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = {executor.submit(run_script, preprocessing_script_paths[script]):
                        script for script in scripts if script in preprocessing_script_paths}

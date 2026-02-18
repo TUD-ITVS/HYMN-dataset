@@ -86,18 +86,18 @@ def data_merge(systems: list, systems_paths: dict[str, str]) -> None:
             lambda x: f"{int(x)}" if pd.notna(x) and not isinstance(x, list) else x
         )
 
-    export_df.to_csv(f"data/csv/merged.csv", index=False)
-    merged_df.to_pickle(f"data/pickle/merged.pkl")
-    merged_df.to_parquet(f"data/parquet/merged.parquet")
+    export_df.to_csv(f"data/processed/csv/merged.csv", index=False)
+    merged_df.to_pickle(f"data/processed/pickle/merged.pkl")
+    merged_df.to_parquet(f"data/processed/parquet/merged.parquet")
 
 
 if __name__ == '__main__':
     systems_to_process = ['wifi', 'ble', 'uwb', 'gnss', 'nr5g']
     preprocessing_data_paths = {
-        'wifi': 'data/pickle/wifi.pkl',
-        'ble': 'data/pickle/ble.pkl',
-        'uwb': 'data/pickle/uwb.pkl',
-        'gnss': 'data/pickle/gnss.pkl',
-        'nr5g': 'data/pickle/nr5g.pkl'
+        'wifi': 'data/processed/pickle/wifi.pkl',
+        'ble': 'data/processed/pickle/ble.pkl',
+        'uwb': 'data/processed/pickle/uwb.pkl',
+        'gnss': 'data/processed/pickle/gnss.pkl',
+        'nr5g': 'data/processed/pickle/nr5g.pkl'
     }
     data_merge(systems_to_process, preprocessing_data_paths)

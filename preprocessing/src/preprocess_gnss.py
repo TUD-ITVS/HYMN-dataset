@@ -35,7 +35,7 @@ def load_rinex(file: str) -> glp.RinexObs:
         print("RINEX data loaded successfully from pickle file.")
     else:
         rinex_obs = glp.RinexObs(file)
-        pickle.dump(rinex_obs, open('preprocessing/raw_data/gnss/preprocessed_rinex.pkl', 'wb'))
+        pickle.dump(rinex_obs, open('preprocessing/raw/gnss/preprocessed_rinex.pkl', 'wb'))
         print("RINEX data loaded successfully and saved to preprocessed_rinex.pkl")
     return rinex_obs
 
@@ -53,7 +53,7 @@ def read_data(rinex_obs: glp.RinexObs, dump_file_dir: str) -> pd.DataFrame:
 
     data = rinex_obs
 
-    data = glp.add_sv_states(data, download_directory="preprocessing/raw_data/gnss/ephemeris/")
+    data = glp.add_sv_states(data, download_directory="data/raw/gnss/ephemeris/")
     data = data.pandas_df()
     data.loc[:, 'ts'] = data.apply(lambda row:
                                                      (glp.gps_millis_to_datetime(
@@ -65,20 +65,20 @@ def read_data(rinex_obs: glp.RinexObs, dump_file_dir: str) -> pd.DataFrame:
 
 def get_point_ids(data: pd.DataFrame) -> pd.DataFrame:
 
-    time_reference = pd.read_pickle('preprocessing/reference/time_reference.pkl')
+    time_reference = pd.read_pickle('data/reference/pickle/time_reference.pkl')
 
     # Create a temporary timestamp datetime column to filter the dataset
     data['timestamp_temp'] = pd.to_datetime(data['ts'].astype(float),
-                                                    unit='ms') + pd.Timedelta(hours=2)
+                                                    unit='ms')
 
     # Initialize mess_id column with None
-    data['mess_id'] = None
+    data['point_id'] = None
 
     # Assign mess_id based on the time range in time_reference
     for idx, row in time_reference.iterrows():
         # Assign mess_id to rows in trajData where timestamp is within the range
-        timestampRange = (data['timestamp_temp'] >= row['startTime']) & (data['timestamp_temp'] <= row['endTime'])
-        data.loc[timestampRange, 'mess_id'] = row['mess_id']
+        timestampRange = (data['timestamp_temp'] >= row['start_time_UTC']) & (data['timestamp_temp'] <= row['end_time_UTC'])
+        data.loc[timestampRange, 'point_id'] = row['point']
 
 
     # Drop the temporary timestamp datetime column
@@ -103,11 +103,11 @@ def get_ground_truth(data: pd.DataFrame) -> pd.DataFrame:
     pd.DataFrame: Merged DataFrame with ground truth data.
     """
 
-    groundTruth = pd.read_pickle('preprocessing/reference/ground_truth.pkl')
-    groundTruth = groundTruth[['mess_id', 'gnss-antenne', 'XYZ_gnss']]
+    groundTruth = pd.read_pickle('data/reference/pickle/point_coordinates.pkl')
+    groundTruth = groundTruth[['point_id', 'X_ECEF_GNSS', 'Y_ECEF_GNSS', 'Z_ECEF_GNSS', 'X_LOCAL_GNSS', 'Y_LOCAL_GNSS', 'Z_LOCAL_GNSS']]
 
 
-    data = data.merge(groundTruth, on ='mess_id', how ='outer')
+    data = data.merge(groundTruth, on ='point_id', how ='outer')
     data = data.sort_values(by ='ts')
     return data
 
@@ -129,16 +129,15 @@ def generate_final_output(data: pd.DataFrame, nav_iono: str, output_dir: str) ->
     # Calculating the Atmospheric Errors
     data = calculate_athmospheric_corrected_pseudorange(data, nav_iono)
 
+
     # Reorder columns to match the final output format
     final_columns = ['point_id', 'ts', 'gnss_sv_id', 'observation_code', 'raw_pr_m', 'corr_pr_m',
                      'carrier_phase', 'raw_doppler_hz', 'cn0_dbhz',
                      'x_sv_m', 'y_sv_m', 'z_sv_m', 'vx_sv_mps', 'vy_sv_mps', 'vz_sv_mps',
-                     'b_sv_m', 'b_dot_sv_mps',
-                     'ref', 'ref_ecef']
+                     'b_sv_m', 'b_dot_sv_mps']
 
     data = data[final_columns]
-
-    data = rename_points(data, point_column_name='point_id')
+    data = get_ground_truth(data)
 
     # Convert all columns to native Python types
     for col in data.columns:
@@ -150,7 +149,7 @@ def generate_final_output(data: pd.DataFrame, nav_iono: str, output_dir: str) ->
 
 
 
-def preprocess_gnss(raw_dir: str = 'preprocessing/raw_data/gnss/', processed_dir: str = 'data/') -> None:
+def preprocess_gnss(raw_dir: str = 'data/raw/gnss/', processed_dir: str = 'data/') -> None:
     # Trajectory GNSS File
     rinexFile = os.path.join(raw_dir, 'all.24O')
     pickledFile = os.path.join(raw_dir + 'preprocessed_rinex.pkl')

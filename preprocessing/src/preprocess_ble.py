@@ -10,6 +10,13 @@ REQUIRED_RANGE_LENGTH = 5
 INVALID_RANGE_VALUE = 0.0
 TIMESTAMP_MULTIPLIER = 1000
 
+ANCHOR_IDS = {"1": "BLE_01",
+              "2": "BLE_02",
+              "3": "BLE_03",
+              "4": "BLE_04",
+              "5": "BLE_05"
+              }
+
 def load_json_logs(file_path):
     """Load and parse JSON logs from a file, filtering for entries with 'message'."""
     with open(file_path, "r") as fh:
@@ -23,7 +30,7 @@ def create_dataframe_from_logs(logs):
     temp_df = pd.DataFrame()
     temp_df["ts"] = [int(row["time"] * TIMESTAMP_MULTIPLIER) for row in logs]
     temp_df["ts_pc"] = [[int(x * TIMESTAMP_MULTIPLIER) for x in row["timestamp_pc"]] for row in logs]
-    temp_df["anchor_ids"] = [row["anchor_ids"] for row in logs]
+    temp_df["anchor_ids"] = [["BLE1", "BLE2", "BLE3", "BLE4", "BLE5"] for row in logs]
     temp_df["tag_ids"] = [row["tag_id"] for row in logs]
     temp_df["ranges"] = [row["ranges"] for row in logs]
 
@@ -46,13 +53,12 @@ def filter_and_clean_dataframe(df):
     # Keep only readings with the required number of range entries
     df = df[df["ranges"].apply(lambda arr: len(arr) == REQUIRED_RANGE_LENGTH)]
 
-    # Rename columns and select the relevant ones
-    df.rename(columns={"metirionic": "ref"}, inplace=True)
-    df = df[["point_id", "ts", "anchor_ids", "ranges", "ref"]].copy()
+
+    df = df[["point_id", "ts", "anchor_ids", "ranges", "X_LOCAL_BLE", "Y_LOCAL_BLE", "Z_LOCAL_BLE"]].copy()
 
     return df
 
-def preprocess_ble(input_dir: str = 'preprocessing/raw_data/ble/', output_dir: str = 'data/') -> None:
+def preprocess_ble(input_dir: str = 'data/raw/ble/', output_dir: str = 'data/') -> None:
     """
     Preprocess BLE data from JSON files into a structured DataFrame.
 

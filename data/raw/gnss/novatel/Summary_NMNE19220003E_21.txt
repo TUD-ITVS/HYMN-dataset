@@ -1,0 +1,47 @@
+
+The following conversion was completed at 2024-12-17T18:08:43.054Z
+
+
+Input File was NMNE19220003E_21.LOG, 34301628 bytes from \Documents\NovatelLocal
+
+
+Converted files were output to \Documents\NovatelLocal\NMNE19220003E_21
+
+
+Logs were converted within the following time range from the input file 
+
+    GNSS Time:
+      Start time : 2337, 315580.052
+      Finish time: 2337, 319481.287
+
+    UTC Time:
+      Start time : 2024-10-23T15:39:40.052Z
+      Finish time: 2024-10-23T16:44:41.287Z
+
+    Total Duration: 01:05:01
+      
+
+The following 15 log(s) were converted successfully to RINEXv3_03 
+
+      ID | Name                          | Source #| Output #|
+---------+-------------------------------+---------+---------+
+    1696 | BDSEPHEMERIS                  |     504 |     504 |
+    1429 | BESTGNSSPOS                   |    3901 |       0 |
+      42 | BESTPOS                       |    3901 |    3901 |
+    1310 | GALFNAVEPHEMERIS              |     157 |     157 |
+    1309 | GALINAVEPHEMERIS              |     590 |     590 |
+     723 | GLOEPHEMERIS                  |     245 |     245 |
+       7 | GPSEPHEM                      |     475 |     475 |
+    1945 | INSCONFIG                     |       1 |       0 |
+    1465 | INSPVAX                       |    3901 |       0 |
+      43 | RANGE                         |       0 |    3901 |
+     140 | RANGECMP                      |    3901 |       0 |
+    1462 | RAWIMUSX                      |  487545 |       0 |
+      93 | RXSTATUS                      |    9200 |       0 |
+     101 | TIME                          |    3901 |       0 |
+      37 | VERSION                       |       1 |       1 |
+
+
+
+29725266 bytes could not be converted.
+

@@ -1,3 +1,0 @@
-gnss-lib-py
-pandas~=2.3.3
-pyarrow~=22.0.0

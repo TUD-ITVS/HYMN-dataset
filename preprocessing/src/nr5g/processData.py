@@ -8,7 +8,7 @@ Created on Mon Nov 25 15:30:42 2024
 import pandas as pd
 
 class DataProcessor:
-    def __init__(self, df, messungTimePath='preprocessing/reference/time_reference.pkl'):
+    def __init__(self, df, messungTimePath='preprocessing/reference/pickle/time_reference.pkl'):
         self.df = df
         self.messungTime = pd.read_pickle(messungTimePath)
         

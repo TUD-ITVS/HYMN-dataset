@@ -4,10 +4,17 @@ import numpy as np
 from preprocessing.src.utils import add_point_ground_truth, save_df
 
 AP_COLUMNS = ['AP1', 'AP2', 'AP3', 'AP4', 'AP5', 'AP6']
-FINAL_COLUMNS = ['point_id', 'ts', 'anchor_ids', 'ranges', 'ref']
+FINAL_COLUMNS = ['point_id', 'ts', 'anchor_ids', 'ranges', 'X_LOCAL_WIFI', 'Y_LOCAL_WIFI', 'Z_LOCAL_WIFI']
+
+AP_MAPPING = {'AP1': 'WIFI_01',
+              'AP2': 'WIFI_02',
+              'AP3': 'WIFI_03',
+              'AP4': 'WIFI_04',
+              'AP5': 'WIFI_05',
+              'AP6': 'WIFI_06'}
 
 
-def preprocess_wifi(input_file: str = 'preprocessing/raw_data/wifi/ranges_combined.csv') -> None:
+def preprocess_wifi(input_file: str = 'data/raw/wifi/ranges_combined.csv') -> None:
     """
     Preprocess WiFi data by loading, transforming, and saving it in a standardized format.
 
@@ -42,6 +49,8 @@ def preprocess_wifi(input_file: str = 'preprocessing/raw_data/wifi/ranges_combin
 
     # Select and order final columns
     df = df[FINAL_COLUMNS]
+
+    df['anchor_ids'] = df['anchor_ids'].apply(lambda ids: [AP_MAPPING.get(id, id) for id in ids])
 
     # Save the processed data
     save_df(df, "wifi")
