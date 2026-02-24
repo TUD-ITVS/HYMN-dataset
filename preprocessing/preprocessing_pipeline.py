@@ -1,16 +1,15 @@
 import concurrent.futures
-import os
 import subprocess
 import sys
 
 from preprocessing.src.merge_data import data_merge
 
-preprocessing_script_paths = {
-    'wifi': 'preprocessing/src/preprocess_wifi.py',
-    'ble': 'preprocessing/src/preprocess_ble.py',
-    'uwb': 'preprocessing/src/preprocess_uwb.py',
-    'gnss': 'preprocessing/src/preprocess_gnss.py',
-    'nr5g': 'preprocessing/src/preprocess_nr5g.py'
+preprocessing_modules = {
+    "wifi": "preprocessing.src.preprocess_wifi",
+    "ble": "preprocessing.src.preprocess_ble",
+    "uwb": "preprocessing.src.preprocess_uwb",
+    "gnss": "preprocessing.src.preprocess_gnss",
+    "nr5g": "preprocessing.src.preprocess_nr5g",
 }
 
 preprocessed_data_paths = {
@@ -22,14 +21,17 @@ preprocessed_data_paths = {
 }
 
 
-def run_script(script_path: str) -> tuple[str, str, str]:
-    python_path = sys.executable  # Get current Python interpreter path
-    result = subprocess.run([python_path, script_path],
-                          capture_output=True, 
-                          text=True)
-    return script_path, result.stdout, result.stderr
+def run_module(module_name: str) -> tuple[str, str, str, int]:
+    python_path = sys.executable
+    result = subprocess.run(
+        [python_path, "-m", module_name],
+        capture_output=True,
+        text=True,
+    )
+    return module_name, result.stdout, result.stderr, result.returncode
 
-def run_preprocessing_scripts(scripts: list[str]) -> None:
+
+def run_preprocessing_scripts(systems: list[str]) -> None:
     """
     Runs preprocessing scripts provided in the list concurrently.
     Only scripts that exist in the `preprocessing_script_paths` are executed.
@@ -40,19 +42,21 @@ def run_preprocessing_scripts(scripts: list[str]) -> None:
     :return: None
     """
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = {executor.submit(run_script, preprocessing_script_paths[script]):
-                       script for script in scripts if script in preprocessing_script_paths}
+        futures = [
+            executor.submit(run_module, preprocessing_modules[system])
+            for system in systems
+            if system in preprocessing_modules
+        ]
         for future in concurrent.futures.as_completed(futures):
-            script = futures[future]
-            try:
-                script, stdout, stderr = future.result()
+            module_name, stdout, stderr, rc = future.result()
+            if rc != 0:
+                print(f"Errors in {module_name}:")
+                if stdout:
+                    print(stdout)
                 if stderr:
-                    print(f"Errors in {script} script:")
                     print(stderr)
-                else:
-                    print(f"Script {script} finished successfully.\n")
-            except Exception as exc:
-                print(f"Script {script} generated an exception: {exc}")
+            else:
+                print(f"{module_name} finished successfully.\n")
 
 
 def run_preprocessing_pipeline() -> None:

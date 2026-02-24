@@ -5,7 +5,7 @@
 [![DOI](https://zenodo.org/badge/1115026300.svg)](https://doi.org/10.5281/zenodo.17979434)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)
-![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
+![Python 3.8-<3.13](https://img.shields.io/badge/python-3.8--%3C3.13-blue.svg)
 
 ---
 
@@ -23,19 +23,27 @@ The dataset is designed to facilitate research and development in the field of i
 1. Clone the repository:
    ```bash
    git clone https://github.com/TUD-ITVS/HYMN-dataset 
+2. Optional: Create a virtual python environment using venv. Note that you will need to use python 3.9.-3.12. if you want to use the preprocessing scripts, as gnss_lib_py does not support newer versions yet. You may check compatibility [here](https://pypi.org/project/gnss-lib-py/).
 
-2. Install dependencies
+    Windows (assuming python 3.12): 
     ```bash
-   pip install -r requirements.txt
-   
+    py -3.12 -m venv venv
+    venv\Scripts\activate
+    ```
+    Mac/Linux (assuming python 3.12):
+   ```bash
+   python3.12 -m venv venv
+   source venv/bin/activate 
+
 3. Explore the dataset using the example script:
     ```bash
-   python examples/explore_dataset.py
+   pip install -r examples/requirements.txt
+   python examples/example_iterator.py
      
 4. Optional: Run the preprocessing script
     ```bash
    pip install -r preprocessing/requirements.txt
-    python -m preprocessing.main
+   python -m preprocessing.preprocessing_pipeline
 
 
 ## Questions and issues
@@ -48,5 +56,5 @@ For other inquiries, please visit our [Organization Page](https://tu-dresden.de/
 ## License
 
 This project is dual-licensed:
-- The **source code** (including the preprocessing scripts) is licensed under the [MIT License](LICENSE-CODE.txt).
-- The **dataset** is licensed under the [Creative Commons Attribution 4.0 International (CC-BY 4.0) License](LICENSE-DATA.txt).
+- The **source code** (including the preprocessing scripts) is licensed under the [MIT License](LICENSE-CODE).
+- The **dataset** is licensed under the [Creative Commons Attribution 4.0 International (CC-BY 4.0) License](LICENSE-DATA).

@@ -2,13 +2,19 @@
 This folder contains the preprocessing scripts for the data.
 
 ## Installation
-python -m pip install -r preprocessing/requirements.txt        
-python -m pip install -e preprocessing        
+Install the required packages:
+`python -m pip install -r preprocessing/requirements.txt`  
+`python -m pip install -e preprocessing `
+
+Note that python version < 3.13 is required due to upstream dependencies. 
 
 ## Preprocessing Pipeline
 
 ### Overview
 The preprocessing pipeline transforms raw measurement data from multiple wireless positioning technologies into a unified, structured dataset suitable for analysis and modeling. The pipeline processes five different wireless technologies: WiFi, Bluetooth Low Energy (BLE), Ultra-Wideband (UWB), GNSS, and 5G NR.
+
+### Run the whole pipeline
+`python -m preprocessing.preprocessing_pipeline` from project root directory.
 
 ### Pipeline Architecture
 The preprocessing follows a modular approach with dedicated preprocessing scripts for each technology. Data is then merged into one unified dataset using a common timestamp.

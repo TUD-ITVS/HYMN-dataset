@@ -151,11 +151,11 @@ def main():
     anchors_raw = _filter_crs(anchors_raw, "LOCAL")
     points_raw = _filter_crs(points_raw, "LOCAL")
 
+    plt.figure(figsize=(12, 12))
     ax = plt.gca()
     # fontsize for all text in the plot
     plt.rcParams.update({"font.size": 12})
     ax.grid(True, linestyle="--", color="0.75")
-
 
     # Anchors: color by technology encoded in point_id (e.g., BLE_01 -> ble) and label them.
     ax_x, ax_y, ax_cols = _get_xy(anchors_raw)
