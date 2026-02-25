@@ -15,6 +15,10 @@ from preprocessing.src.utils import add_point_ground_truth, save_df
 
 FINAL_COLUMNS = ["point_id", "ts", "anchor_ids", "pos", "SNR", "X_LOCAL_NR5G", "Y_LOCAL_NR5G", "Z_LOCAL_NR5G"]
 
+RENAME_RADIO_UNIT = {
+    "RU1" : "NR5G_11",
+    "RU2" : "NR5G_12",
+    "RU3" : "NR5G_13" }
 
 
 # Rotation matrix in x-y-plane
@@ -142,6 +146,12 @@ def preprocess_nr5g(
     # Final data formatting
     df.rename(columns={"5g-antenne": "ref"}, inplace=True)
     # `pos` is already created above in a vectorized way.
+
+    # Remove nan rows in anchor_ids
+    df.dropna(subset=["anchor_ids"], inplace=True)
+
+    # Rename column anchor_ids using RENAME_RADIO_UNIT
+    df['anchor_ids'] = df['anchor_ids'].apply(lambda anchors: [RENAME_RADIO_UNIT.get(anchor, anchor) for anchor in anchors])
 
     # Sort by timestamp
     df.sort_values(by='ts', inplace=True)
