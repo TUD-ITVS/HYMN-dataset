@@ -50,6 +50,8 @@ Additional GNSS-specific columns:
 | Y_ECEF_GNSS | m | Ground-truth Y-coordinate in ECEF.                                                                                                 |
 | Z_ECEF_GNSS | m | Ground-truth Z-coordinate in ECEF.                                                                                                 |
 
+GNSS raw data is also provided in the raw folder as RINEX files. Main obs file is `raw/gnss/all.24O`. 
+
 ## Synchronized Merged File
 
 The `merged.csv` file (and its Parquet/Pickle counterparts) provides a synchronized view of all technologies. Its primary purpose is to act as a central index for multi-modal analysis.
