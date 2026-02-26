@@ -23,6 +23,7 @@ The dataset is designed to facilitate research and development in the field of i
 1. Clone the repository:
    ```bash
    git clone https://github.com/TUD-ITVS/HYMN-dataset 
+      ```
 2. Optional: Create a virtual python environment using venv. Note that you will need to use python 3.9.-3.12. if you want to use the preprocessing scripts, as gnss_lib_py does not support newer versions yet. You may check compatibility [here](https://pypi.org/project/gnss-lib-py/).
 
     Windows (assuming python 3.12): 
@@ -33,18 +34,21 @@ The dataset is designed to facilitate research and development in the field of i
     Mac/Linux (assuming python 3.12):
    ```bash
    python3.12 -m venv venv
-   source venv/bin/activate 
+   source venv/bin/activate    
+   ```
 
 3. Explore the dataset using the example script:
     ```bash
+   cd HYMN-dataset
    pip install -r examples/requirements.txt
    python examples/example_iterator.py
+   ```
      
 4. Optional: Run the preprocessing script
     ```bash
    pip install -r preprocessing/requirements.txt
    python -m preprocessing.preprocessing_pipeline
-
+   ```
 
 ## Questions and issues
 Please raise an issue on the GitHub Issue tracker for any questions or problems you encounter.
