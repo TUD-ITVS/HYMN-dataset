@@ -251,7 +251,7 @@ def example_calculate_wifi_ranging_error(measurement: Dict[str, Any]):
 
 
 if __name__ == "__main__":
-    ds = Dataset(folder="data/processed/", systems=["wifi", "gnss", "ble", "uwb", "nr5g"], backend="parquet", use_tqdm=True)
+    ds = Dataset(folder="data/processed/", systems=["wifi", "gnss", "ble", "uwb", "nr5g"], backend="pickle", use_tqdm=True)
     print(f"Dataset length: {len(ds)}")
 
     for i, item in enumerate(ds):
