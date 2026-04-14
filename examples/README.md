@@ -4,6 +4,25 @@ This folder contains small, self-contained scripts that show how to work with th
 
 > Paths in these examples are written to be run from the **repository root**.
 
+## Installation
+
+### Poetry (recommended)
+Install dependencies from `examples/pyproject.toml` and `examples/poetry.lock`:
+
+```bash
+cd examples
+poetry install
+```
+
+### pip (backward compatibility)
+`examples/requirements.txt` is generated from `examples/poetry.lock` for pip-based workflows:
+
+```bash
+python -m pip install -r examples/requirements.txt
+```
+
+Supported Python versions: `>=3.11,<3.13`.
+
 ## `example_iterator.py`
 
 Purpose:
