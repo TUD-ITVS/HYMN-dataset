@@ -9,7 +9,11 @@
 
 ## Description
 The HYMN dataset is a comprehensive collection of wireless positioning measurements gathered using multiple technologies, including WiFi, Bluetooth Low Energy (BLE), Ultra-Wideband (UWB), GNSS, and 5G NR. 
-The dataset is designed to facilitate research and development in the field of indoor and outdoor positioning systems.
+The dataset is designed to facilitate research and development in the field of indoor-outdoor positioning systems.
+
+A data description paper detailing the dataset collection, structure, and potential applications has been published in IEEE Data Descriptions.
+The paper can be found [here](https://doi.org/10.1109/IEEEDATA.2026.3691044).
+
 ## Repository Structure
 * [`/data`](data): Contains the dataset files.
   * [`/data/processed`](data/processed): Processed positioning measurements. See [Processed Data README](data/processed/README.md) for format details and data dictionary.
@@ -70,8 +74,27 @@ Please raise an issue on the GitHub Issue tracker for any questions or problems 
 For other inquiries, please visit our [Organization Page](https://tu-dresden.de/bu/verkehr/vis/itvs) or contact the corresponding author as listed in the associated IEEE Data Description paper.
 
 ## Citation
- Will be added once the paper is published.
+Please cite the following paper if you use the dataset:
+
+```M. Ammad, A. Michler, P. Schwarzbach, J. Ninnemann, H. Ußler and O. Michler, "Descriptor: A Hybrid Indoor and Indoor-Outdoor Positioning Multi-Technology Dataset (HYMN)," in IEEE Data Descriptions, doi: 10.1109/IEEEDATA.2026.3691044. keywords: {HYMN dataset;Radio localization dataset;signals of opportunity;seamless positioning;Ultra-Wideband (UWB);Bluetooth Low Energy (BLE);WiFi;5G New Radio (NR);GNSS}, ```
  
+You can find the paper on [IEEE Xplore](https://doi.org/10.1109/IEEEDATA.2026.3691044) (open access) or on [arXiv](https://arxiv.org/abs/2604.20349) as preprint.
+
+You can use the following BibTeX entry:
+````bibtex
+@ARTICLE{11512962,
+  author={Ammad, Muhammad and Michler, Albrecht and Schwarzbach, Paul and Ninnemann, Jonas and Ußler, Hagen and Michler, Oliver},
+  journal={IEEE Data Descriptions}, 
+  title={Descriptor: A Hybrid Indoor and Indoor-Outdoor Positioning Multi-Technology Dataset (HYMN)}, 
+  year={2026},
+  volume={},
+  number={},
+  pages={1-9},
+  keywords={HYMN dataset;Radio localization dataset;signals of opportunity;seamless positioning;Ultra-Wideband (UWB);Bluetooth Low Energy (BLE);WiFi;5G New Radio (NR);GNSS},
+  doi={10.1109/IEEEDATA.2026.3691044}}
+
+````
+
 ## License
 
 This project is dual-licensed:
